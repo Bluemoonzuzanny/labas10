@@ -31,6 +31,12 @@ size_t Size(void* ptr)
 // extraMemoryAllocated counts bytes of extra memory allocated
 void mergeSort(int pData[], int l, int r)
 {
+    if (l >= r)
+        return;
+    int m = l + (r - l) / 2;
+    mergeSort(pData, l, m);
+    mergeSort(pData, m + 1, r);
+    merge(pData, l, m, r);
 }
 
 // parses input file to an integer array

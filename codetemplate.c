@@ -5,32 +5,70 @@
 // Trie structure
 struct Trie
 {	
+	struct Trie *children[26];
+	int count;
 };
 
 // Inserts the word to the trie structure
 void insert(struct Trie *pTrie, char *word)
 {
+	struct Trie *node = pTrie;
+	while (*word) {
+		if (!node->children[*word - 'a'])
+			node->children[*word - 'a'] = calloc(1, sizeof(struct Trie));
+		node = node->children[*word - 'a'];
+		word++;
+	}
+	node->count++;
 }
 
 // computes the number of occurances of the word
 int numberOfOccurances(struct Trie *pTrie, char *word)
 {
+	struct TrieNode *crawler = root;
+	while (*word) {
+		int index = *word - 'a';
+		if (!crawler->children[index])
+			return 0;
+		crawler = crawler->children[index];
+		word++;
+	}
+	return crawler->count;
 }
 
 // deallocate the trie structure
 struct Trie *deallocateTrie(struct Trie *pTrie)
 {
+	if (!root) return;
+	for (int i = 0; i < 26; i++) {
+		if (root->children[i])
+			deallocateTrie(root->children[i]);
+	}
+	free(root);
 }
 
 // Initializes a trie structure
 struct Trie *createTrie()
 {
+	return calloc(1, sizeof(struct Trie));
 }
 
 // this function will return number of words in the dictionary,
 // and read all the words in the dictionary to the structure words
 int readDictionary(char *filename, char **pInWords)
 {
+	FILE *file = fopen(filename, "r");
+	if (!file) return -1;
+	
+	int numWords = 0;
+	char word[100];
+	while (fgets(word, sizeof(word), file)) {
+		word[strcspn(word, "\n")] = 0;
+		pInWords[numWords] = strdup(word);
+		numWords++;
+	}
+	fclose(file);
+	return numWords;
 }
 
 int main(void)
